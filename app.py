@@ -5,7 +5,7 @@ from flask_jwt_extended import JWTManager
 from config import Config
 from models.dbconfig import db, migrate
 from models.user import bcrypt
-from resources.auth import Signup, Login
+from resources.auth import Signup, Login, Me
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -19,6 +19,7 @@ api = Api(app)
 
 api.add_resource(Signup, "/signup")
 api.add_resource(Login, "/login")
+api.add_resource(Me, "/me")
 
 
 @app.route("/")
