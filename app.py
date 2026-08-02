@@ -6,6 +6,7 @@ from config import Config
 from models.dbconfig import db, migrate
 from models.user import bcrypt
 from resources.auth import Signup, Login, Me
+from resources.notes import Notes
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -20,6 +21,7 @@ api = Api(app)
 api.add_resource(Signup, "/signup")
 api.add_resource(Login, "/login")
 api.add_resource(Me, "/me")
+api.add_resource(Notes, "/notes")
 
 
 @app.route("/")
