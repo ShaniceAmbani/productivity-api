@@ -1,9 +1,11 @@
 from flask import Flask
+from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
 from config import Config
 from models.dbconfig import db, migrate
 from models.user import bcrypt
+from resources.auth import Signup
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -13,6 +15,9 @@ migrate.init_app(app, db)
 bcrypt.init_app(app)
 
 jwt = JWTManager(app)
+api = Api(app)
+
+api.add_resource(Signup, "/signup")
 
 
 @app.route("/")
