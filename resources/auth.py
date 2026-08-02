@@ -15,22 +15,29 @@ class Signup(Resource):
         data = request.get_json()
 
         username = data.get("username")
-        email = data.get("email")
         password = data.get("password")
+        password_confirmation = data.get("password_confirmation")
 
-        if not username or not email or not password:
-            return {"error": "Username, email and password are required."}, 400
+        if not username or not password:
+            return {
+                "error": "Username and password are required."
+            }, 400
 
-        existing_user = User.query.filter(
-            (User.username == username) | (User.email == email)
-        ).first()
+        if password != password_confirmation:
+            return {
+                "error": "Passwords do not match."
+            }, 400
+
+        existing_user = User.query.filter_by(username=username).first()
 
         if existing_user:
-            return {"error": "Username or email already exists."}, 409
+            return {
+                "error": "Username already exists."
+            }, 409
 
         user = User(
             username=username,
-            email=email
+            email=f"{username}@example.com"
         )
 
         user.password = password
@@ -41,8 +48,7 @@ class Signup(Resource):
         token = create_access_token(identity=str(user.id))
 
         return {
-            "message": "User created successfully.",
-            "access_token": token,
+            "token": token,
             "user": user.to_dict()
         }, 201
 
@@ -55,18 +61,21 @@ class Login(Resource):
         password = data.get("password")
 
         if not username or not password:
-            return {"error": "Username and password are required."}, 400
+            return {
+                "error": "Username and password are required."
+            }, 400
 
         user = User.query.filter_by(username=username).first()
 
         if not user or not user.authenticate(password):
-            return {"error": "Invalid username or password."}, 401
+            return {
+                "error": "Invalid username or password."
+            }, 401
 
         token = create_access_token(identity=str(user.id))
 
         return {
-            "message": "Login successful.",
-            "access_token": token,
+            "token": token,
             "user": user.to_dict()
         }, 200
 
@@ -79,6 +88,8 @@ class Me(Resource):
         user = User.query.get(user_id)
 
         if not user:
-            return {"error": "User not found."}, 404
+            return {
+                "error": "User not found."
+            }, 404
 
         return user.to_dict(), 200
